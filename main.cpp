@@ -1,58 +1,19 @@
 #include <iostream>
-#include <vector>
 #include <memory>
 
 #define echo(x) std::cout << x << std::endl
 
 #define Main int main
 
-class MemoryManager
-{
-public:
-    std::vector<std::unique_ptr<void, void (*)(void *)>> pointers;
-
-    template <typename T>
-    T *allocate(size_t size)
-    {
-        T *ptr = new T[size];
-        if (ptr)
-        {
-            pointers.push_back(std::unique_ptr<void, void (*)(void *)>(ptr, [](void *p)
-                                                                       { delete[] static_cast<T *>(p); }));
-        }
-        else
-        {
-            std::cerr << "Memory allocation failed" << std::endl;
-        }
-        return ptr;
-    }
-
-    void free_all()
-    {
-        pointers.clear();
-    }
-
-    ~MemoryManager()
-    {
-        free_all();
-    }
-};
-
-MemoryManager globalManager;
-
 template <typename T>
 class ManagedVar
 {
 public:
-    T *data;
+    std::unique_ptr<T> data; // استفاده از unique_ptr به جای پوینتر خام
 
     ManagedVar(T value)
     {
-        data = globalManager.allocate<T>(1);
-        if (!data)
-        {
-            throw std::runtime_error("Memory allocation failed");
-        }
+        data = std::make_unique<T>(); // تخصیص حافظه به صورت امن
         *data = value;
     }
 
@@ -63,7 +24,7 @@ public:
 
     T *operator->()
     {
-        return data;
+        return data.get();
     }
 
     ManagedVar &operator=(T value)
