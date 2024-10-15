@@ -9,11 +9,11 @@ template <typename T>
 class ManagedVar
 {
 public:
-    std::unique_ptr<T> data; // استفاده از unique_ptr به جای پوینتر خام
+    std::unique_ptr<T> data;
 
     ManagedVar(T value)
     {
-        data = std::make_unique<T>(); // تخصیص حافظه به صورت امن
+        data = std::make_unique<T>();
         *data = value;
     }
 
