@@ -8,7 +8,7 @@
 !*/
 
 # Don't ignore JSON files in all directories
-!**/*.json
+# !**/*.json
 
 # Don't ignore C files in all directories
 !**/*.c

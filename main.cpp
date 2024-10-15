@@ -2,6 +2,8 @@
 #include <vector>
 #include <memory>
 
+#define PRINT(x) std::cout << x << std::endl
+
 // کلاس مدیریت حافظه
 class MemoryManager {
 public:
@@ -65,15 +67,15 @@ int main() {
     ManagedVar<double> arr2 = 3.14;  // متغیر double با مقدار اولیه 3.14
 
     // دسترسی به مقادیر متغیرها
-    std::cout << "arr1: " << *arr1 << std::endl;
-    std::cout << "arr2: " << *arr2 << std::endl;
+    PRINT("arr1: " << *arr1);
+    PRINT("arr2: " << *arr2);
 
     // تغییر مقادیر متغیرها
     *arr1 = 20;
     *arr2 = 6.28;
 
-    std::cout << "arr1 (after modification): " << *arr1 << std::endl;
-    std::cout << "arr2 (after modification): " << *arr2 << std::endl;
+    PRINT("arr1 (after modification): " << *arr1);
+    PRINT("arr2 (after modification): " << *arr2);
 
     // حافظه به صورت خودکار در پایان برنامه آزاد می‌شود
     return 0;
