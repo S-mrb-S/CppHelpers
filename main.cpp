@@ -36,7 +36,7 @@ class ManagedVar {
 public:
     T* data;
 
-    // سازنده که به صورت خودکار از globalManager استفاده می‌کند
+    // سازنده تبدیل که امکان مقداردهی اولیه با استفاده از '=' را فراهم می‌کند
     ManagedVar(T value) {
         data = globalManager.allocate<T>(1); // تخصیص حافظه برای یک مقدار
         *data = value;
@@ -51,12 +51,18 @@ public:
     T* operator->() {
         return data;
     }
+
+    // اپراتور تخصیص برای مقداردهی بعد از ایجاد شیء
+    ManagedVar& operator=(T value) {
+        *data = value;
+        return *this;
+    }
 };
 
 int main() {
     // حالا به صورت ساده‌تر متغیرها تعریف می‌شوند
-    ManagedVar<int> arr1(10);      // متغیر int با مقدار اولیه 10
-    ManagedVar<double> arr2(3.14); // متغیر double با مقدار اولیه 3.14
+    ManagedVar<int> arr1 = 10;       // متغیر int با مقدار اولیه 10
+    ManagedVar<double> arr2 = 3.14;  // متغیر double با مقدار اولیه 3.14
 
     // دسترسی به مقادیر متغیرها
     std::cout << "arr1: " << *arr1 << std::endl;
