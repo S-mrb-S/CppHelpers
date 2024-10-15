@@ -2,7 +2,6 @@
 #include <vector>
 #include <memory>
 
-// #define << .
 #define echo(x) std::cout << x << std::endl
 
 // کلاس مدیریت حافظه
@@ -12,9 +11,9 @@ public:
 
     template<typename T>
     T* allocate(size_t size) {
-        T* ptr = static_cast<T*>(malloc(size * sizeof(T)));
+        T* ptr = new T[size];  // استفاده از new به جای malloc
         if (ptr) {
-            pointers.push_back({ ptr, free });
+            pointers.push_back({ ptr, [](void* p) { delete[] static_cast<T*>(p); } }); // استفاده از delete
         } else {
             std::cerr << "Memory allocation failed" << std::endl;
         }
