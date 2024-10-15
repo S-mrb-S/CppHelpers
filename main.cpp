@@ -2,6 +2,7 @@
 #include <vector>
 #include <memory>
 
+// کلاس مدیریت حافظه
 class MemoryManager {
 public:
     std::vector<std::unique_ptr<void, void(*)(void*)>> pointers;
@@ -26,16 +27,18 @@ public:
     }
 };
 
-// یک کلاس برای مدیریت متغیرها و تخصیص خودکار حافظه
+// ایجاد شیء سراسری MemoryManager
+MemoryManager globalManager;
+
+// کلاس ManagedVar که حافظه را مدیریت می‌کند
 template<typename T>
 class ManagedVar {
 public:
     T* data;
-    MemoryManager& manager;
 
-    // سازنده که مقدار اولیه می‌گیرد و حافظه تخصیص می‌دهد
-    ManagedVar(MemoryManager& m, T value) : manager(m) {
-        data = manager.allocate<T>(1); // تخصیص حافظه برای یک مقدار
+    // سازنده که به صورت خودکار از globalManager استفاده می‌کند
+    ManagedVar(T value) {
+        data = globalManager.allocate<T>(1); // تخصیص حافظه برای یک مقدار
         *data = value;
     }
 
@@ -51,11 +54,9 @@ public:
 };
 
 int main() {
-    MemoryManager manager;
-
-    // ایجاد متغیرهای مدیریت شده
-    ManagedVar<int> arr1(manager, 10);   // متغیر int با مقدار اولیه 10
-    ManagedVar<double> arr2(manager, 3.14); // متغیر double با مقدار اولیه 3.14
+    // حالا به صورت ساده‌تر متغیرها تعریف می‌شوند
+    ManagedVar<int> arr1(10);      // متغیر int با مقدار اولیه 10
+    ManagedVar<double> arr2(3.14); // متغیر double با مقدار اولیه 3.14
 
     // دسترسی به مقادیر متغیرها
     std::cout << "arr1: " << *arr1 << std::endl;
