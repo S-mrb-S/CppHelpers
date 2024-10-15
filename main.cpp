@@ -2,7 +2,7 @@
 #include <vector>
 #include <memory>
 
-#define PRINT(x) std::cout << x << std::endl
+#define echo(x) std::cout << x << std::endl
 
 // کلاس مدیریت حافظه
 class MemoryManager {
@@ -11,9 +11,9 @@ public:
 
     template<typename T>
     T* allocate(size_t size) {
-        T* ptr = static_cast<T*>(malloc(size * sizeof(T)));
+        T* ptr = new T[size]; // استفاده از new به جای malloc
         if (ptr) {
-            pointers.push_back({ ptr, free });
+            pointers.push_back(std::unique_ptr<void, void(*)(void*)>(ptr, [](void* p) { delete[] static_cast<T*>(p); }));
         } else {
             std::cerr << "Memory allocation failed" << std::endl;
         }
@@ -41,6 +41,9 @@ public:
     // سازنده تبدیل که امکان مقداردهی اولیه با استفاده از '=' را فراهم می‌کند
     ManagedVar(T value) {
         data = globalManager.allocate<T>(1); // تخصیص حافظه برای یک مقدار
+        if (!data) {
+            throw std::runtime_error("Memory allocation failed"); // بررسی موفقیت تخصیص
+        }
         *data = value;
     }
 
@@ -67,15 +70,15 @@ int main() {
     ManagedVar<double> arr2 = 3.14;  // متغیر double با مقدار اولیه 3.14
 
     // دسترسی به مقادیر متغیرها
-    PRINT("arr1: " << *arr1);
-    PRINT("arr2: " << *arr2);
+    echo("arr1: " << *arr1);
+    echo("arr2: " << *arr2);
 
     // تغییر مقادیر متغیرها
     arr1 = 20;
     *arr2 = 6.28;
 
-    PRINT("arr1 (after modification): " << *arr1);
-    PRINT("arr2 (after modification): " << *arr2);
+    echo("arr1 (after modification): " << *arr1);
+    echo("arr2 (after modification): " << *arr2);
 
     // حافظه به صورت خودکار در پایان برنامه آزاد می‌شود
     return 0;
