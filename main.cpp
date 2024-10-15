@@ -9,12 +9,11 @@ template <typename T>
 class ManagedVar
 {
 public:
-    std::unique_ptr<T> data;
+    std::shared_ptr<T> data;
 
     ManagedVar(T value)
     {
-        data = std::make_unique<T>();
-        *data = value;
+        data = std::make_shared<T>(value);
     }
 
     T &operator*()
