@@ -44,8 +44,8 @@ public:
         *data = value;
     }
 
-    // اپراتور دسترسی به مقدار
-    T& operator*() {
+    // اپراتور تبدیل به نوع
+    operator T&() {
         return *data;
     }
 
@@ -67,15 +67,15 @@ int main() {
     ManagedVar<double> arr2 = 3.14;  // متغیر double با مقدار اولیه 3.14
 
     // دسترسی به مقادیر متغیرها
-    PRINT("arr1: " << *arr1);
-    PRINT("arr2: " << *arr2);
+    PRINT("arr1: " << arr1);
+    PRINT("arr2: " << arr2);
 
-    // تغییر مقادیر متغیرها
-    *arr1 = 20;
-    *arr2 = 6.28;
+    // تغییر مقادیر متغیرها بدون نیاز به *
+    arr1 = 20; // تغییر مقدار به سادگی
+    arr2 = 6.28;
 
-    PRINT("arr1 (after modification): " << *arr1);
-    PRINT("arr2 (after modification): " << *arr2);
+    PRINT("arr1 (after modification): " << arr1);
+    PRINT("arr2 (after modification): " << arr2);
 
     // حافظه به صورت خودکار در پایان برنامه آزاد می‌شود
     return 0;
