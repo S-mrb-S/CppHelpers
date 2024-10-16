@@ -1,17 +1,27 @@
 #include "include/hc.hpp"
 
 fun {
-    let<int> arr1 = 10;
-    let<double> arr2 = 3.14;
+    let arr1 = 10;
+    let arr1 = 3.14;
 
-    echo("arr1: " << *arr1);
-    echo("arr2: " << *arr2);
+    let myLet(20);
+    std::cout << myLet << std::endl;  // خروجی: 20 (int)
 
-    *arr1 = 20;
-    *arr2 = 6.28;
+    let myLet("Hello");
+    myLet << " World";  // اضافه کردن " World" به رشته
+    std::cout << myLet << std::endl;  // خروجی: Hello World
 
-    echo("arr1 (after modification): " << *arr1);
-    echo("arr2 (after modification): " << *arr2);
+    myLet >> "New Value";  // جایگزینی مقدار با "New Value"
+    std::cout << myLet << std::endl;  // خروجی: New Value
+
+    // echo("arr1: " << *arr1);
+    // echo("arr2: " << *arr2);
+
+    // *arr1 = 20;
+    // *arr2 = 6.28;
+
+    // echo("arr1 (after modification): " << *arr1);
+    // echo("arr2 (after modification): " << *arr2);
 
     return 0;
 }
