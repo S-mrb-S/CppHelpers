@@ -2,7 +2,6 @@
 // From macros.cpp, To var.cpp
 
 #include "../macros/macros.cpp"
-#include <any>
 
 func let
 {
@@ -17,15 +16,15 @@ public:
     }
 
     // عملگر << برای اضافه کردن به انتهای مقدار (در صورت رشته بودن)
-    let &operator<<(const string &value)
+    let &operator<<(const std::string &value)
     {
-        if (data.type() == typeid(string))
+        if (data.type() == typeid(std::string))
         {
-            std::any_cast<string>(data) += value;  // اضافه کردن به انتهای رشته
+            std::any_cast<std::string>(data) += value;  // اضافه کردن به انتهای رشته
         }
         else
         {
-            std::cerr << "Error: Cannot use << with non-string types!" << std::endl;
+            std::cout << "Error: Cannot use << with non-string types!" << std::endl;
         }
         return *this;
     }
@@ -46,9 +45,9 @@ public:
         {
             os << std::any_cast<int>(obj.data);
         }
-        else if (obj.data.type() == typeid(string))
+        else if (obj.data.type() == typeid(std::string))
         {
-            os << std::any_cast<string>(obj.data);
+            os << std::any_cast<std::string>(obj.data);
         }
         else
         {
