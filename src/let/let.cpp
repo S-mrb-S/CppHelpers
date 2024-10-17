@@ -2,7 +2,7 @@
 // From macros.cpp, To var.cpp
 #pragma once
 
-#include "../macros/macros.cpp"
+#include "../core/cc.hpp"
 
 class let
 {

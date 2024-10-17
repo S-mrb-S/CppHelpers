@@ -1,32 +1,6 @@
-#include "include/hc.hpp"
 
 
-
-
-class async {
-public:
-    template<typename Func>
-    async(Func&& val) {
-        std::async(std::launch::async, std::forward<Func>(val)).get();
-    }
-
-    template<typename Func>
-    async& operator=(Func&& val) {
-        std::async(std::launch::async, std::forward<Func>(val)).get();
-    }
-};
-
-
-
-// fnc(public, MyClassName)
-//     void display() {
-//         std::cout << "Hello from class!" << std::endl;
-//     }
-// };
-
-// fn hellofun(int hi){
-
-// }
+#include "src/core/cc.hpp"
 
 // int main() {
 //     // استفاده از ماکرو برای ایجاد یک لامبدا

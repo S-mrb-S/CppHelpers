@@ -14,8 +14,6 @@
 #include <map>
 #include <set>
 
-#include "../let/let.cpp"
-
 // using std
 using std::any;
 using std::any_cast;
@@ -34,6 +32,13 @@ using std::runtime_error;
 
 using std::cout;
 using std::endl;
+
+// src
+#include "../macros/macros.cpp"
+#include "../let/let.cpp"
+#include "../threads/async.cpp"
+#include "../var/var.cpp"
+
 
 #ifdef NO_MAIN_FOUND
 #error "Error: Your program does not contain a 'main' function!"
