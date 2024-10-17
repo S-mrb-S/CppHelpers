@@ -3,37 +3,30 @@
 
 #include "../core/topc.hpp"
 
-#define fnc class                     // for class
-#define run int main()                 // for int main()
-#define end return 0
+// classes
+// #define fnc class                     // for class
+// #define fnc(Access, ClassName) class ClassName { Access:
 
-#define fn inline std::any              // for std::any
-#define fto std::any_cast              // for std::any_cast
+// #define FN_PUBLIC public:
+// #define fnc(...) fnc_impl(__VA_ARGS__, FN_PUBLIC)
+// #define fnc_impl(Access, ClassName) class ClassName { Access
+
+// #define fnc(Access, ClassName, Methods) \
+//     class ClassName { Access: Methods };
+#define tp(Typename) template<typename Typename>
+
+#define run int main()                 // for int main()
+#define end return 0 // end main
+
+// Functions
+#define fn std::any              // fn: for normal use and normal function, any type!
+#define fnto std::any_cast              // fnto: set type for fn
+#define fun inline fn              // fun: inline function for normal use
+#define func constexpr fn              // func: const function, fast and compiled time
 
 #define echo(x) std::cout << x << std::endl  // for printing to console
 
-#define vec std::vector                // for std::vector
-#define map std::map                    // for std::map
-#define set std::set                    // for std::set
-
-#define ptr std::shared_ptr            // for std::shared_ptr
-#define uptr std::unique_ptr           // for std::unique_ptr
-#define wptr std::weak_ptr         // for std::weak_ptr
-
-#define lambda [&]                      // for lambda captures by reference
-
-#define rfor(i, start, end) for (int i = start; i < end; ++i)  // for loop
-
-#define size(x) (sizeof(x) / sizeof((x)[0])) // for array size
-
-#define merr(msg) throw std::runtime_error(msg) // for make throwing exceptions
-
-#define rfile(filename) std::ifstream(filename) // for reading files
-
-#define wfile(filename) std::ofstream(filename) // for writing files
-
-#define print_container(c) for (const auto& item : c) std::cout << item << ' '; std::cout << std::endl  // print container
-
+#define panic(msg) throw std::runtime_error(msg) // for make throwing exceptions
 #define assert(condition) if (!(condition)) throw std::logic_error("Assertion failed") // for assertions
 
 

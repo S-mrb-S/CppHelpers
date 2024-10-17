@@ -3,13 +3,12 @@
 
 #include "../macros/macros.cpp"
 
-fnc let
+class let
 {
 public:
-    std::any data;
+    fn data;
 
-    // سازنده برای مقداردهی به هر نوع
-    template <typename T>
+    tp(T)
     let(T value)
     {
         data = value;
@@ -20,7 +19,7 @@ public:
     {
         if (data.type() == typeid(str))
         {
-            std::any_cast<str>(data) += value;  // اضافه کردن به انتهای رشته
+            fto<str>(data) += value; // اضافه کردن به انتهای رشته
         }
         else
         {
@@ -30,10 +29,10 @@ public:
     }
 
     // عملگر >> برای جایگزینی مقدار
-    template <typename T>
+    tp(T)
     let &operator>>(T value)
     {
-        data = value;  // جایگزینی مقدار با نوع جدید
+        data = value; // جایگزینی مقدار با نوع جدید
         return *this;
     }
 
@@ -43,15 +42,15 @@ public:
         // بررسی نوع و نمایش مقدار
         if (obj.data.type() == typeid(int))
         {
-            os << std::any_cast<int>(obj.data);
+            os << fto<int>(obj.data);
         }
         else if (obj.data.type() == typeid(str))
         {
-            os << std::any_cast<str>(obj.data);
+            os << fto<str>(obj.data);
         }
         else
         {
-            os << "Unsupported type";  // در صورت عدم پشتیبانی
+            os << "Unsupported type"; // در صورت عدم پشتیبانی
         }
 
         return os;

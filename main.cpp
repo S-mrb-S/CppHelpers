@@ -17,25 +17,23 @@
 class async {
 public:
     template<typename Func>
-    async(Func&& func) {
+    async(Func&& class) {
         std::async(std::launch::async, std::forward<Func>(func)).get();
     }
 
     template<typename Func>
-    async& operator=(Func&& func) {
+    async& operator=(Func&& fn) {
         std::async(std::launch::async, std::forward<Func>(func)).get();
     }
 };
 
-class S
-{
-public:
-    fn square(int s) // redundant use of inline
-    {
-        // this function is automatically inline
-        // function body
-    }
-};
+
+
+// fnc(public, MyClassName)
+//     void display() {
+//         std::cout << "Hello from class!" << std::endl;
+//     }
+// };
 
 fn hellofun(int hi){
 
