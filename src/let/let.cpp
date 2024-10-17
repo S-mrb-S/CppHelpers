@@ -1,35 +1,36 @@
 
 // From macros.cpp, To var.cpp
+#pragma once
 
 #include "../macros/macros.cpp"
 
 class let
 {
 public:
-    fn data;
+    any data;
 
-    tp(T)
+    ctyp(T)
     let(T value)
     {
         data = value;
     }
 
     // عملگر << برای اضافه کردن به انتهای مقدار (در صورت رشته بودن)
-    let &operator<<(const str &value)
+    let &operator<<(const string &value)
     {
-        if (data.type() == typeid(str))
+        if (data.type() == typeid(string))
         {
-            fto<str>(data) += value; // اضافه کردن به انتهای رشته
+            any_cast<string>(data) += value; // اضافه کردن به انتهای رشته
         }
         else
         {
-            std::cout << "Error: Cannot use << with non-string types!" << std::endl;
+            echo("Error: Cannot use << with non-string types!");
         }
         return *this;
     }
 
     // عملگر >> برای جایگزینی مقدار
-    tp(T)
+    ctyp(T)
     let &operator>>(T value)
     {
         data = value; // جایگزینی مقدار با نوع جدید
@@ -42,11 +43,11 @@ public:
         // بررسی نوع و نمایش مقدار
         if (obj.data.type() == typeid(int))
         {
-            os << fto<int>(obj.data);
+            os << any_cast<int>(obj.data);
         }
-        else if (obj.data.type() == typeid(str))
+        else if (obj.data.type() == typeid(string))
         {
-            os << fto<str>(obj.data);
+            os << any_cast<string>(obj.data);
         }
         else
         {

@@ -1,10 +1,10 @@
 
 // From let.cpp, To echo.cpp
-
+#pragma once
 #include "../let/let.cpp"
 
 template <typename T>
-fnc var
+class var
 {
 public:
     std::shared_ptr<T> data;

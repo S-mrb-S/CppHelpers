@@ -2,28 +2,17 @@
 
 
 
-#include <iostream>
-#include <future>
-
-
-
-#include <iostream>
-#include <future>
-#include <utility>
-
-#define lama(func_body) [&](auto&&... args) { func_body }
-#define lm []()
 
 class async {
 public:
     template<typename Func>
-    async(Func&& class) {
-        std::async(std::launch::async, std::forward<Func>(func)).get();
+    async(Func&& val) {
+        std::async(std::launch::async, std::forward<Func>(val)).get();
     }
 
     template<typename Func>
-    async& operator=(Func&& fn) {
-        std::async(std::launch::async, std::forward<Func>(func)).get();
+    async& operator=(Func&& val) {
+        std::async(std::launch::async, std::forward<Func>(val)).get();
     }
 };
 
@@ -35,27 +24,27 @@ public:
 //     }
 // };
 
-fn hellofun(int hi){
+// fn hellofun(int hi){
 
-}
+// }
 
-int main() {
-    // استفاده از ماکرو برای ایجاد یک لامبدا
-    async myAsync = hellofun(5);
+// int main() {
+//     // استفاده از ماکرو برای ایجاد یک لامبدا
+//     async myAsync = hellofun(5);
 
-    async myAsync = lm {
-            std::cout << "Hi, Params: Some parameters" << std::endl;
-        };
+//     async myAsync = lm {
+//             std::cout << "Hi, Params: Some parameters" << std::endl;
+//         };
     
-    async a = []() { std::cout << "Function a\n"; };
-    async b = []() { std::cout << "Function b\n"; };
-    async c = []() { std::cout << "Function c\n"; };
+//     async a = []() { std::cout << "Function a\n"; };
+//     async b = []() { std::cout << "Function b\n"; };
+//     async c = []() { std::cout << "Function c\n"; };
 
-    // زنجیره‌ای کردن انتساب‌ها
-    a = b = c; // این خط به ترتیب c به b و سپس b به a انتساب می‌دهد
+//     // زنجیره‌ای کردن انتساب‌ها
+//     a = b = c; // این خط به ترتیب c به b و سپس b به a انتساب می‌دهد
 
-    return 0;
-}
+//     return 0;
+// }
 
 
 
@@ -64,7 +53,7 @@ int main() {
 run {
     let arr1 = 10;
     // let arr1 = 3.14;
-    hellofun(5);
+    // hellofun(5);
 
     let myLet(20);
     std::cout << myLet << std::endl;  // خروجی: 20 (int)
@@ -85,5 +74,5 @@ run {
     // echo("arr1 (after modification): " << *arr1);
     // echo("arr2 (after modification): " << *arr2);
 
-    end;
+    run_end;
 }
