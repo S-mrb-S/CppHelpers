@@ -1,8 +1,14 @@
 #include "include/hc.hpp"
 
-fn {
+
+fn hellofun(int hi){
+
+}
+
+run {
     let arr1 = 10;
     // let arr1 = 3.14;
+    hellofun(5);
 
     let myLet(20);
     std::cout << myLet << std::endl;  // خروجی: 20 (int)

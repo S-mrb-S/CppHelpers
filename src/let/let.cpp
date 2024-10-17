@@ -3,7 +3,7 @@
 
 #include "../macros/macros.cpp"
 
-func let
+fnc let
 {
 public:
     std::any data;

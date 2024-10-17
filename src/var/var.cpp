@@ -4,7 +4,7 @@
 #include "../let/let.cpp"
 
 template <typename T>
-func var
+fnc var
 {
 public:
     std::shared_ptr<T> data;
