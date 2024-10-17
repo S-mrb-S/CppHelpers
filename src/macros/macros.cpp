@@ -1,8 +1,7 @@
-
-// From topc.hpp, To let.cpp
+// ===========================================================
 #pragma once
-
 #include "../core/cc.hpp"
+// ===========================================================
 
 // class
 #define ctyp(Typename) template <typename Typename>

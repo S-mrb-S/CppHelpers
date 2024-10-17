@@ -1,7 +1,7 @@
-
-// From let.cpp, To echo.cpp
+// ===========================================================
 #pragma once
-#include "../let/let.cpp"
+#include "../core/cc.hpp"
+// ===========================================================
 
 template <typename T>
 class var

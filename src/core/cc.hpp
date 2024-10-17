@@ -1,6 +1,16 @@
 // Top container header for C++ modules
 #pragma once
 
+/*
+    ***
+        std libs first
+
+        using method two
+
+        src files (core) last
+    ***
+*/
+
 // std libs
 #include <iostream>
 #include <string>
@@ -14,7 +24,7 @@
 #include <map>
 #include <set>
 
-// using std
+
 using std::any;
 using std::any_cast;
 using std::string;
@@ -32,6 +42,7 @@ using std::runtime_error;
 
 using std::cout;
 using std::endl;
+
 
 // src
 #include "../macros/macros.cpp"
