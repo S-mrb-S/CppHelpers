@@ -5,6 +5,7 @@
 
 #define fnc class                     // for class
 #define run int main()                 // for int main()
+#define end return 0
 
 #define fn std::any              // for std::any
 #define fto std::any_cast              // for std::any_cast

@@ -29,5 +29,5 @@ run {
     // echo("arr1 (after modification): " << *arr1);
     // echo("arr2 (after modification): " << *arr2);
 
-    return 0;
+    end;
 }
