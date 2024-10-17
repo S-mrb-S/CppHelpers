@@ -1,9 +1,57 @@
 #include "include/hc.hpp"
 
 
+
+#include <iostream>
+#include <future>
+
+
+
+#include <iostream>
+#include <future>
+#include <utility>
+
+#define lama(func_body) [&](auto&&... args) { func_body }
+#define lm []()
+
+class async {
+public:
+    template<typename Func>
+    async(Func&& func) {
+        std::async(std::launch::async, std::forward<Func>(func)).get();
+    }
+
+    template<typename Func>
+    async& operator=(Func&& func) {
+        std::async(std::launch::async, std::forward<Func>(func)).get();
+    }
+};
+
 fn hellofun(int hi){
 
 }
+
+int main() {
+    // استفاده از ماکرو برای ایجاد یک لامبدا
+    async myAsync = hellofun(5);
+
+    async myAsync = lm {
+            std::cout << "Hi, Params: Some parameters" << std::endl;
+        };
+    
+    async a = []() { std::cout << "Function a\n"; };
+    async b = []() { std::cout << "Function b\n"; };
+    async c = []() { std::cout << "Function c\n"; };
+
+    // زنجیره‌ای کردن انتساب‌ها
+    a = b = c; // این خط به ترتیب c به b و سپس b به a انتساب می‌دهد
+
+    return 0;
+}
+
+
+
+
 
 run {
     let arr1 = 10;
