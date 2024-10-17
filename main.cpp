@@ -27,6 +27,16 @@ public:
     }
 };
 
+class S
+{
+public:
+    fn square(int s) // redundant use of inline
+    {
+        // this function is automatically inline
+        // function body
+    }
+};
+
 fn hellofun(int hi){
 
 }

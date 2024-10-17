@@ -7,7 +7,7 @@
 #define run int main()                 // for int main()
 #define end return 0
 
-#define fn std::any              // for std::any
+#define fn inline std::any              // for std::any
 #define fto std::any_cast              // for std::any_cast
 
 #define echo(x) std::cout << x << std::endl  // for printing to console
