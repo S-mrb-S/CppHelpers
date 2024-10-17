@@ -1,6 +1,6 @@
 #include "include/hc.hpp"
 
-fun {
+fn {
     let arr1 = 10;
     // let arr1 = 3.14;
 

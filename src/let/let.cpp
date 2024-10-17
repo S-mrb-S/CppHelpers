@@ -16,11 +16,11 @@ public:
     }
 
     // عملگر << برای اضافه کردن به انتهای مقدار (در صورت رشته بودن)
-    let &operator<<(const std::string &value)
+    let &operator<<(const str &value)
     {
-        if (data.type() == typeid(std::string))
+        if (data.type() == typeid(str))
         {
-            std::any_cast<std::string>(data) += value;  // اضافه کردن به انتهای رشته
+            std::any_cast<str>(data) += value;  // اضافه کردن به انتهای رشته
         }
         else
         {
@@ -45,9 +45,9 @@ public:
         {
             os << std::any_cast<int>(obj.data);
         }
-        else if (obj.data.type() == typeid(std::string))
+        else if (obj.data.type() == typeid(str))
         {
-            os << std::any_cast<std::string>(obj.data);
+            os << std::any_cast<str>(obj.data);
         }
         else
         {
