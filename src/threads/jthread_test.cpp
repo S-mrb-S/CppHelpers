@@ -290,10 +290,16 @@
 #include <vector>
 #include <functional>
 #include <future>
-#include <mutex>
 
 class FireAndForget {
 public:
+    // اضافه کردن تسک با استفاده از عملگر >>
+    template <typename Func>
+    FireAndForget& operator>>(Func&& func) {
+        futures_.push_back(run(std::forward<Func>(func))); // اضافه کردن future به لیست
+        return *this; // بازگشت به شی فعلی
+    }
+
     // اجرا کردن یک تسک و بازگشت future برای صبر کردن
     template <typename Func>
     std::future<void> run(Func&& func) {
@@ -331,33 +337,26 @@ public:
 
 private:
     std::vector<std::future<void>> futures_; // نگهداری futures برای تسک‌ها
-
-public:
-    // متد برای اضافه کردن تسک به لیست
-    template <typename Func>
-    void addTask(Func&& func) {
-        futures_.push_back(run(std::forward<Func>(func))); // اضافه کردن future به لیست
-    }
 };
 
 int main() {
     FireAndForget fireAndForget;
 
-    // اضافه کردن تسک‌ها به لیست
-    fireAndForget.addTask([]() {
+    // اضافه کردن تسک‌ها با استفاده از عملگر >>
+    fireAndForget >> []() {
         std::this_thread::sleep_for(std::chrono::seconds(2));
         std::cout << "Task 1 executed\n";
-    });
+    };
 
-    fireAndForget.addTask([]() {
+    fireAndForget >> []() {
         std::this_thread::sleep_for(std::chrono::seconds(1));
         std::cout << "Task 2 executed\n";
-    });
+    };
 
-    fireAndForget.addTask([]() {
+    fireAndForget >> []() {
         std::this_thread::sleep_for(std::chrono::seconds(3));
         std::cout << "Task 3 executed\n";
-    });
+    };
 
     // صبر کردن برای اتمام تسک‌ها
     std::cout << "Waiting for all tasks to complete...\n";
