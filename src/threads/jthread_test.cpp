@@ -377,6 +377,17 @@ int main() {
 
     // اجرای فوری یک تسک با استفاده از عملگر <<
     fireAndForget << []() {
+        FireAndForget fireAndForget;
+        fireAndForget << []() {
+        std::cout << "Immediate Task executed\n";
+        FireAndForget fireAndForget;
+        fireAndForget << []() {
+        std::cout << "Immediate Task executed\n";
+        };
+        };
+    };
+    
+    fireAndForget << []() {
         std::cout << "Immediate Task executed\n";
     };
 
