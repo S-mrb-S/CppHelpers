@@ -290,6 +290,8 @@
 #include <vector>
 #include <functional>
 #include <future>
+#include <exception>
+#include <memory>
 
 class FireAndForget {
 public:
@@ -304,12 +306,16 @@ public:
     template <typename Func>
     FireAndForget& operator<<(Func&& func) {
         std::jthread([func = std::forward<Func>(func)]() {
+            // بررسی وضعیت حذف حافظه
             try {
+                if (std::uncaught_exceptions() > 0) {
+                    throw std::runtime_error("Memory is being deallocated, stopping task.");
+                }
                 func(); // اجرای تابع
             } catch (const std::exception& e) {
-                std::cerr << "Exception in thread: " << e.what() << '\n';
+                std::cerr << "Exception in immediate task: " << e.what() << '\n';
             } catch (...) {
-                std::cerr << "Unknown exception in thread.\n";
+                std::cerr << "Unknown exception in immediate task.\n";
             }
         }).detach(); // جدا کردن نخ برای اجرای مستقل
 
