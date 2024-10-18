@@ -7,9 +7,13 @@
 # Don't ignore directories themselves (to ensure file patterns inside them are considered)
 !*/
 
+**/build
+**/CMake*
+
 # Don't ignore JSON files in all directories
 !**/*.json
 
 # Don't ignore C files in all directories
 !**/*.hpp
 !**/*.cpp
+!**/CMakeLists.*
