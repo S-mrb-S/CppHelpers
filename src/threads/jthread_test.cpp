@@ -300,6 +300,22 @@ public:
         return *this; // بازگشت به شی فعلی
     }
 
+    // اجرای فوری تسک با استفاده از عملگر <<
+    template <typename Func>
+    FireAndForget& operator<<(Func&& func) {
+        std::jthread([func = std::forward<Func>(func)]() {
+            try {
+                func(); // اجرای تابع
+            } catch (const std::exception& e) {
+                std::cerr << "Exception in thread: " << e.what() << '\n';
+            } catch (...) {
+                std::cerr << "Unknown exception in thread.\n";
+            }
+        }).detach(); // جدا کردن نخ برای اجرای مستقل
+
+        return *this; // بازگشت به شی فعلی
+    }
+
     // اجرا کردن یک تسک و بازگشت future برای صبر کردن
     template <typename Func>
     std::future<void> run(Func&& func) {
@@ -351,6 +367,11 @@ int main() {
     fireAndForget >> []() {
         std::this_thread::sleep_for(std::chrono::seconds(1));
         std::cout << "Task 2 executed\n";
+    };
+
+    // اجرای فوری یک تسک با استفاده از عملگر <<
+    fireAndForget << []() {
+        std::cout << "Immediate Task executed\n";
     };
 
     fireAndForget >> []() {
