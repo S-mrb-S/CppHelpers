@@ -4,7 +4,7 @@
 // ===========================================================
 
 // class
-#define ctyp(Typename) template <typename Typename>
+#define typc(Typename) template <typename Typename>
 
 // main
 #define run int main()   // for int main()
@@ -12,10 +12,10 @@
 #define run_err return 1 // force quit, for end main (return error)
 
 // function type
-#define fn any            // fn: for normal use and normal function, any type!
-#define fnto any_cast     // fnto: set type for fn
-#define fun inline fn     // fun: inline function for normal use
-#define func constexpr fn // func: const function, fast and compiled time
+// #define fn any            // fn: for normal use and normal function, any type!
+// #define fnto any_cast     // fnto: set type for fn
+#define fn inline any     // fun: inline function for normal use
+#define fnc constexpr any // func: const function, fast and compiled time
 
 // print
 #define echo(x) cout << x << endl // for printing to console
