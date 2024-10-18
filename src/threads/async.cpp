@@ -3,21 +3,26 @@
 #include "../core/cc.hpp"
 // ===========================================================
 
-class async {
+class asyncTaskClass {
 public:
-    async() = default;
+    // سازنده پیش‌فرض
+    asyncTaskClass() = default;
 
+    // سازنده برای ایجاد یک شی asyncTaskClass از یک لامبدا
     template<typename Func>
-    async(Func&& func) {
+    asyncTaskClass(Func&& func) {
         future_ = std::async(std::launch::async, std::forward<Func>(func));
     }
 
+    // عملگر هم‌ارزی برای اضافه کردن توابع لامبدا
     template<typename Func>
-    async& operator<<(Func&& func) {
+    asyncTaskClass& operator<<(Func&& func) {
+        // ایجاد یک شی جدید async و اضافه کردن آن به لیست
         tasks_.emplace_back(std::async(std::launch::async, std::forward<Func>(func)));
-        return *this;
+        return *this; // برگشت این شی برای زنجیره‌ای کردن
     }
 
+    // تابع برای گرفتن نتایج
     void get_all() {
         for (auto& task : tasks_) {
             task.get();
@@ -25,29 +30,8 @@ public:
     }
 
 private:
-    std::vector<std::future<void>> tasks_;
-    std::future<void> future_; // No needed
+    std::vector<std::future<void>> tasks_; // وکتور برای ذخیره وظایف
+    std::future<void> future_; // وظیفه جاری (که دیگر به آن نیاز نیست)
 };
 
-// int main() {
-//     async task; // ایجاد یک شی async
-
-//     // استفاده از عملگر << برای اضافه کردن توابع لامبدا
-//     task << []() {
-//         std::this_thread::sleep_for(std::chrono::seconds(2)); // شبیه‌سازی کار
-//         std::cout << "Function a is running\n";
-//     } << []() {
-//         std::cout << "Function b is running\n";
-//         std::this_thread::sleep_for(std::chrono::seconds(1)); // شبیه‌سازی کار
-//     } << []() {
-//         std::this_thread::sleep_for(std::chrono::seconds(3)); // شبیه‌سازی کار
-//         std::cout << "Function c is running\n";
-//     } << []() {
-//         std::cout << "Function d is running\n";
-//     };
-
-//     // صبر کردن برای اتمام تمام وظایف
-//     task.get_all();
-
-//     return 0;
-// }
+asyncTaskClass xgo;
