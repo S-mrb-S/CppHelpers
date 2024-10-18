@@ -239,7 +239,7 @@ public:
 
 private:
     std::vector<std::jthread> tasks_;
-    ThreadPool thread_pool_{4}; // ایجاد یک استخر با 4 نخ
+    ThreadPool thread_pool_{std::thread::hardware_concurrency()}; // استفاده از تعداد هسته‌ها
 };
 
 jthreadTaskClass go;
