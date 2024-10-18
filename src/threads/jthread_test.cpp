@@ -55,52 +55,56 @@
 class jthreadTaskClass
 {
 public:
-    // سازنده پیش‌فرض
-    jthreadTaskClass() = default;
+    template <typename Func>
+    jthreadTaskClass &operator>>(Func &&func)
+    {
+        std::jthread j_thread(std::forward<Func>(func));
+        return *this;
+    }
 
-    // عملگر هم‌ارزی برای اضافه کردن توابع لامبدا
     template <typename Func>
     jthreadTaskClass &operator<<(Func &&func)
     {
-        // ایجاد یک jthread و اضافه کردن آن به لیست
         tasks_.emplace_back(std::jthread([func = std::forward<Func>(func)](std::stop_token st)
                                          {
-            // بررسی stop_token برای توقف امن
             if (st.stop_requested()) {
-                return; // در صورت درخواست توقف، تابع را ترک می‌کنیم
+                return;
             }
             func(); }));
-        return *this; // برگشت این شی برای زنجیره‌ای کردن
+        return *this;
     }
 
 private:
-    std::vector<std::jthread> tasks_; // وکتور برای ذخیره jthreadها
+    std::vector<std::jthread> tasks_;
 };
 
 jthreadTaskClass go;
 
 int main()
 {
-
-    // استفاده از عملگر << برای اضافه کردن توابع لامبدا
-    go << []()
-    {
-        std::this_thread::sleep_for(std::chrono::seconds(2)); // شبیه‌سازی کار
-        std::cout << "Function a is running\n";
-    } << []()
-    {
-        std::cout << "Function b is running\n";
-        std::this_thread::sleep_for(std::chrono::seconds(1)); // شبیه‌سازی کار
-    } << []()
-    {
-        std::this_thread::sleep_for(std::chrono::seconds(3)); // شبیه‌سازی کار
-        std::cout << "Function c is running\n";
-    } << []()
-    {
-        std::cout << "Function d is running\n";
+    go >> []() {
+        go << []()
+        {
+            std::this_thread::sleep_for(std::chrono::seconds(2));
+            std::cout << "Function a is running\n";
+        }
+        << []()
+        {
+            std::cout << "Function b is running\n";
+            std::this_thread::sleep_for(std::chrono::seconds(5));
+        }
+        << []()
+        {
+            std::this_thread::sleep_for(std::chrono::seconds(3));
+            std::cout << "Function c is running\n";
+        }
+        << []()
+        {
+            std::cout << "Function d is running\n";
+        };
     };
 
-    go << []()
+    go >> []()
     {
         std::cout << "Function e is running\n";
     };

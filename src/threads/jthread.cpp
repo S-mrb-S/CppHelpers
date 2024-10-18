@@ -6,26 +6,52 @@
 class jthreadTaskClass
 {
 public:
-    // سازنده پیش‌فرض
-    jthreadTaskClass() = default;
+    template <typename Func>
+    jthreadTaskClass &operator>>(Func &&func)
+    {
+        std::jthread([func = std::forward<Func>(func)]func());
+        return *this;
+    }
 
-    // عملگر هم‌ارزی برای اضافه کردن توابع لامبدا
     template <typename Func>
     jthreadTaskClass &operator<<(Func &&func)
     {
-        // ایجاد یک jthread و اضافه کردن آن به لیست
-        tasks_.emplace_back(std::jthread([func = std::forward<Func>(func)](std::stop_token st)
+        std::jthread([func = std::forward<Func>(func)](std::stop_token st)
                                          {
-            // بررسی stop_token برای توقف امن
             if (st.stop_requested()) {
-                return; // در صورت درخواست توقف، تابع را ترک می‌کنیم
+                return;
             }
-            func(); }));
-        return *this; // برگشت این شی برای زنجیره‌ای کردن
+            func(); });
+        return *this;
     }
-
-private:
-    std::vector<std::jthread> tasks_; // وکتور برای ذخیره jthreadها
 };
 
 jthreadTaskClass go;
+
+fn jthread_test()
+{
+    go << lm
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        std::cout << "Function a is running\n";
+    }
+    << lm
+    {
+        std::cout << "Function b is running\n";
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+    << lm
+    {
+        std::this_thread::sleep_for(std::chrono::seconds(3));
+        std::cout << "Function c is running\n";
+    }
+    << lm
+    {
+        std::cout << "Function d is running\n";
+    };
+
+    go << lm
+    {
+        std::cout << "Function e is running\n";
+    };
+}
