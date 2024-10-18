@@ -1,12 +1,21 @@
 #include "src/core/cc.hpp"
 
-run {
+
+
+fn hi()
+{
+
+    endf;
+}
+
+int main()
+{
     let arr1 = 10;
     // let arr1 = 3.14;
     // hellofun(5);
 
     let myLet(20);
-    std::cout << myLet << std::endl;  // خروجی: 20 (int)
+    std::cout << myLet << std::endl; // خروجی: 20 (int)
 
     // let myLet("Hello");
     // myLet << " World";  // اضافه کردن " World" به رشته
@@ -24,5 +33,5 @@ run {
     // echo("arr1 (after modification): " << *arr1);
     // echo("arr2 (after modification): " << *arr2);
 
-    run_end;
+    return 0;
 }

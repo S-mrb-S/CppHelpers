@@ -8,7 +8,7 @@ class let
 public:
     any data;
 
-    typc(T)
+    template <typename T>
     let(T value)
     {
         data = value;
@@ -29,7 +29,7 @@ public:
     }
 
     // عملگر >> برای جایگزینی مقدار
-    typc(T)
+    template <typename T>
     let &operator>>(T value)
     {
         data = value; // جایگزینی مقدار با نوع جدید
