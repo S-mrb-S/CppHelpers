@@ -25,6 +25,7 @@
 #include <set>
 #include <type_traits>
 #include <functional>
+#include <chrono>
 
 using std::any;
 using std::any_cast;
