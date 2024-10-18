@@ -24,6 +24,7 @@
 #include <map>
 #include <set>
 #include <type_traits>
+#include <functional>
 
 using std::any;
 using std::any_cast;

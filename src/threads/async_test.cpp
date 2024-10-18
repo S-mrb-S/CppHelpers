@@ -98,86 +98,58 @@
 // }
 
 #include <iostream>
-#include <functional>  // For std::function
-#include <any>        // For std::any
-#include <string>
+#include <future>
+#include <chrono>
+#include <thread>
 
-// Declare a global instance of AnonymousClass
-class AnonymousClass
-{
-    std::any value; // To hold any type of value
-
+class async {
 public:
-    // Overload << operator for std::any directly
-    AnonymousClass& operator<<(const std::any& val)
-    {
-        value = val;  // Store the std::any directly
-        return *this;  // Return object for chaining
+    // سازنده پیش‌فرض
+    async() = default;
+
+    // سازنده برای ایجاد یک شی async از یک لامبدا
+    template<typename Func>
+    async(Func&& func) {
+        future_ = std::async(std::launch::async, std::forward<Func>(func));
     }
 
-    // Overload << operator for functions returning std::any
-    AnonymousClass& operator<<(std::any(*func)())
-    {
-        value = func();  // Call the function and store the result in 'value'
-        return *this;  // Return object for chaining
+    // عملگر هم‌ارزی برای اضافه کردن توابع لامبدا
+    template<typename Func>
+    async& operator<<(Func&& func) {
+        // اجرای لامبدا و ذخیره نتیجه
+        future_ = std::async(std::launch::async, std::forward<Func>(func));
+        return *this; // برگشت این شی برای زنجیره‌ای کردن
     }
 
-    // Overload << operator for lambdas returning std::any
-    AnonymousClass& operator<<(const std::function<std::any()>& func)
-    {
-        value = func();  // Call the lambda and store the result in 'value'
-        return *this;  // Return object for chaining
+    // تابع برای گرفتن نتیجه
+    auto get() {
+        return future_.get();
     }
 
-    // Print function to show the stored value
-    void print() const
-    {
-        if (value.type() == typeid(int))
-            std::cout << "Value (int): " << std::any_cast<int>(value) << std::endl;
-        else if (value.type() == typeid(std::string))
-            std::cout << "Value (string): " << std::any_cast<std::string>(value) << std::endl;
-        else
-            std::cout << "Value of unknown type." << std::endl;
-    }
+private:
+    std::future<void> future_;
+};
 
-    // Friend function to overload << for printing
-    friend std::ostream& operator<<(std::ostream& out, const AnonymousClass& obj);
-} go;
+int main() {
+    async task; // ایجاد یک شی async با سازنده پیش‌فرض
 
-// Implementation of << operator for printing
-std::ostream& operator<<(std::ostream& out, const AnonymousClass& obj)
-{
-    obj.print(); // Call the print function
-    return out;
-}
+    // استفاده از عملگر << برای اضافه کردن توابع لامبدا
+    task << []() {
+        std::cout << "Function a is running\n";
+        std::this_thread::sleep_for(std::chrono::seconds(2)); // شبیه‌سازی کار
+    } << []() {
+        std::cout << "Function b is running\n";
+        std::this_thread::sleep_for(std::chrono::seconds(1)); // شبیه‌سازی کار
+    } << []() {
+        std::cout << "Function c is running\n";
+        std::this_thread::sleep_for(std::chrono::seconds(3)); // شبیه‌سازی کار
+    } << []() {
+        std::cout << "Function d is running\n";
+        std::this_thread::sleep_for(std::chrono::seconds(2)); // شبیه‌سازی کار
+    };
 
-// An example function returning std::any
-std::any myFunc()
-{
-    return 42;  // Return an integer
-}
-
-// Another example function returning std::any
-std::any myStringFunc()
-{
-    return std::string("Hello, World!");  // Return a string
-}
-
-// Create a global instance of AnonymousClass
-// AnonymousClass obj1;
-
-// Driver function
-int main()
-{
-    // Using << operator directly with std::any-returning function
-    // obj1 << myFunc(); // Store an int in obj1
-
-    // Using << operator with another std::any-returning function
-    // obj1 << myStringFunc(); // Store a string in obj1
-    // std::cout << obj1 << std::endl;  // Print the value (should be "Hello, World!")
-
-    go << myFunc();
-    std::cout << go << std::endl;  // Print the value (should be 42)
+    // صبر کردن برای اتمام تابع آخر
+    task.get();
 
     return 0;
 }
