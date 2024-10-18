@@ -4,11 +4,11 @@
 // ===========================================================
 
 // function type
-#define fn inline any     // fun: inline function for normal use
-#define endf return nullptr // Null pointer type
+#define fn inline std::any  // inline function for normal use
+#define endf return nullptr
 
 // print
-#define echo(x) cout << x << endl // for printing to console
+#define echo(x) std::cout << x << std::endl // printing to console
 
 // lambda
 #define lm []()

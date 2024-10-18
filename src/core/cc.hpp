@@ -42,14 +42,12 @@ using std::weak_ptr;
 using std::logic_error;
 using std::runtime_error;
 
-using std::cout;
-using std::endl;
-
 
 // src
 #include "../macros/macros.cpp"
 #include "../let/let.cpp"
 #include "../threads/async.cpp"
+#include "../threads/jthread.cpp"
 #include "../var/var.cpp"
 
 

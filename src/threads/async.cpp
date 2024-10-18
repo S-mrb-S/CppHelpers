@@ -5,33 +5,51 @@
 
 class asyncTaskClass {
 public:
-    // سازنده پیش‌فرض
-    asyncTaskClass() = default;
-
-    // سازنده برای ایجاد یک شی asyncTaskClass از یک لامبدا
     template<typename Func>
-    asyncTaskClass(Func&& func) {
-        future_ = std::async(std::launch::async, std::forward<Func>(func));
+    asyncTaskClass& operator>>(Func&& func) {
+        std::async(std::launch::async, std::forward<Func>(func)).get();
+        return *this;
     }
 
-    // عملگر هم‌ارزی برای اضافه کردن توابع لامبدا
     template<typename Func>
     asyncTaskClass& operator<<(Func&& func) {
-        // ایجاد یک شی جدید async و اضافه کردن آن به لیست
         tasks_.emplace_back(std::async(std::launch::async, std::forward<Func>(func)));
-        return *this; // برگشت این شی برای زنجیره‌ای کردن
+        return *this;
     }
 
-    // تابع برای گرفتن نتایج
-    void get_all() {
+    void wait() {
         for (auto& task : tasks_) {
             task.get();
         }
     }
 
 private:
-    std::vector<std::future<void>> tasks_; // وکتور برای ذخیره وظایف
-    std::future<void> future_; // وظیفه جاری (که دیگر به آن نیاز نیست)
+    std::vector<std::future<void>> tasks_;
 };
 
 asyncTaskClass xgo;
+
+fn async_test(){
+
+    xgo << []() {
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        std::cout << "Function a is running\n";
+    } << []() {
+        std::cout << "Function b is running\n";
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    } << []() {
+        std::this_thread::sleep_for(std::chrono::seconds(3));
+        std::cout << "Function c is running\n";
+    } << []() {
+        std::cout << "Function d is running\n";
+    };
+
+    xgo >> []() {
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        std::cout << "Function a is running\n";
+    };
+
+    // xgo.wait();
+
+    endf;
+}

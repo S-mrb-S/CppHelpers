@@ -14,12 +14,11 @@ public:
         data = value;
     }
 
-    // عملگر << برای اضافه کردن به انتهای مقدار (در صورت رشته بودن)
     let &operator<<(const string &value)
     {
         if (data.type() == typeid(string))
         {
-            any_cast<string>(data) += value; // اضافه کردن به انتهای رشته
+            any_cast<string>(data) += value;
         }
         else
         {
@@ -28,18 +27,16 @@ public:
         return *this;
     }
 
-    // عملگر >> برای جایگزینی مقدار
     template <typename T>
     let &operator>>(T value)
     {
-        data = value; // جایگزینی مقدار با نوع جدید
+        data = value;
         return *this;
     }
 
-    // عملگر برای نمایش مقدار
     friend std::ostream &operator<<(std::ostream &os, const let &obj)
     {
-        // بررسی نوع و نمایش مقدار
+
         if (obj.data.type() == typeid(int))
         {
             os << any_cast<int>(obj.data);
@@ -50,7 +47,7 @@ public:
         }
         else
         {
-            os << "Unsupported type"; // در صورت عدم پشتیبانی
+            os << "Unsupported type";
         }
 
         return os;
