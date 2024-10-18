@@ -289,44 +289,81 @@
 #include <thread>
 #include <vector>
 #include <functional>
+#include <future>
+#include <mutex>
 
 class FireAndForget {
 public:
+    // اجرا کردن یک تسک و بازگشت future برای صبر کردن
     template <typename Func>
-    void run(Func&& func) {
-        std::jthread([func = std::forward<Func>(func)]() {
-            // اجرای تابع
+    std::future<void> run(Func&& func) {
+        std::promise<void> promise;
+        auto future = promise.get_future();
+
+        // ایجاد یک jthread برای اجرای تسک
+        std::jthread([func = std::forward<Func>(func), promise = std::move(promise)]() mutable {
             try {
-                func();
+                func(); // اجرای تابع
+                promise.set_value(); // علامت زدن اتمام
             } catch (const std::exception& e) {
                 std::cerr << "Exception in thread: " << e.what() << '\n';
+                promise.set_exception(std::current_exception()); // در صورت بروز خطا
             } catch (...) {
                 std::cerr << "Unknown exception in thread.\n";
+                promise.set_exception(std::current_exception()); // در صورت بروز خطا
             }
         }).detach(); // جدا کردن نخ برای اجرای مستقل
+
+        return future; // برگرداندن future
+    }
+
+    // صبر کردن برای اتمام یک تسک خاص
+    void waitForTask(std::future<void>& future) {
+        future.wait(); // انتظار برای اتمام تسک
+    }
+
+    // صبر کردن برای اتمام تمامی تسک‌ها
+    void waitForAllTasks() {
+        for (auto& future : futures_) {
+            future.wait(); // انتظار برای هر تسک
+        }
+    }
+
+private:
+    std::vector<std::future<void>> futures_; // نگهداری futures برای تسک‌ها
+
+public:
+    // متد برای اضافه کردن تسک به لیست
+    template <typename Func>
+    void addTask(Func&& func) {
+        futures_.push_back(run(std::forward<Func>(func))); // اضافه کردن future به لیست
     }
 };
 
 int main() {
     FireAndForget fireAndForget;
 
-    // اجرای تابع به صورت آتش و فراموش کن
-    fireAndForget.run([]() {
-        // std::this_thread::sleep_for(std::chrono::seconds(2));
-        std::cout << "Fire-and-forget task executed\n";
+    // اضافه کردن تسک‌ها به لیست
+    fireAndForget.addTask([]() {
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        std::cout << "Task 1 executed\n";
     });
 
-    // اجرای چندین تابع به صورت آتش و فراموش کن
-    for (int i = 0; i < 5; ++i) {
-        fireAndForget.run([i]() {
-            // std::this_thread::sleep_for(std::chrono::seconds(1));
-            std::cout << "Task " << i << " executed\n";
-        });
-    }
+    fireAndForget.addTask([]() {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::cout << "Task 2 executed\n";
+    });
 
-    // انتظار برای اتمام برنامه
-    // std::this_thread::sleep_for(std::chrono::seconds(3));
-    std::cout << "Main function finished\n";
+    fireAndForget.addTask([]() {
+        std::this_thread::sleep_for(std::chrono::seconds(3));
+        std::cout << "Task 3 executed\n";
+    });
+
+    // صبر کردن برای اتمام تسک‌ها
+    std::cout << "Waiting for all tasks to complete...\n";
+    fireAndForget.waitForAllTasks();
+
+    std::cout << "All tasks completed.\n";
 
     return 0;
 }
