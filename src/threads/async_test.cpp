@@ -101,6 +101,7 @@
 #include <future>
 #include <chrono>
 #include <thread>
+#include <vector>
 
 class async {
 public:
@@ -116,40 +117,42 @@ public:
     // عملگر هم‌ارزی برای اضافه کردن توابع لامبدا
     template<typename Func>
     async& operator<<(Func&& func) {
-        // اجرای لامبدا و ذخیره نتیجه
-        future_ = std::async(std::launch::async, std::forward<Func>(func));
+        // ایجاد یک شی جدید async و اضافه کردن آن به لیست
+        tasks_.emplace_back(std::async(std::launch::async, std::forward<Func>(func)));
         return *this; // برگشت این شی برای زنجیره‌ای کردن
     }
 
-    // تابع برای گرفتن نتیجه
-    auto get() {
-        return future_.get();
+    // تابع برای گرفتن نتایج
+    void get_all() {
+        for (auto& task : tasks_) {
+            task.get();
+        }
     }
 
 private:
-    std::future<void> future_;
+    std::vector<std::future<void>> tasks_; // وکتور برای ذخیره وظایف
+    std::future<void> future_; // وظیفه جاری (که دیگر به آن نیاز نیست)
 };
 
 int main() {
-    async task; // ایجاد یک شی async با سازنده پیش‌فرض
+    async task; // ایجاد یک شی async
 
     // استفاده از عملگر << برای اضافه کردن توابع لامبدا
     task << []() {
-        std::cout << "Function a is running\n";
         std::this_thread::sleep_for(std::chrono::seconds(2)); // شبیه‌سازی کار
+        std::cout << "Function a is running\n";
     } << []() {
         std::cout << "Function b is running\n";
         std::this_thread::sleep_for(std::chrono::seconds(1)); // شبیه‌سازی کار
     } << []() {
-        std::cout << "Function c is running\n";
         std::this_thread::sleep_for(std::chrono::seconds(3)); // شبیه‌سازی کار
+        std::cout << "Function c is running\n";
     } << []() {
         std::cout << "Function d is running\n";
-        std::this_thread::sleep_for(std::chrono::seconds(2)); // شبیه‌سازی کار
     };
 
-    // صبر کردن برای اتمام تابع آخر
-    task.get();
+    // صبر کردن برای اتمام تمام وظایف
+    task.get_all();
 
     return 0;
 }
