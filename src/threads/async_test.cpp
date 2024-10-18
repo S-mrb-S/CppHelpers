@@ -142,7 +142,7 @@ public:
 
     // Friend function to overload << for printing
     friend std::ostream& operator<<(std::ostream& out, const AnonymousClass& obj);
-};
+} go;
 
 // Implementation of << operator for printing
 std::ostream& operator<<(std::ostream& out, const AnonymousClass& obj)
@@ -164,18 +164,20 @@ std::any myStringFunc()
 }
 
 // Create a global instance of AnonymousClass
-AnonymousClass obj1;
+// AnonymousClass obj1;
 
 // Driver function
 int main()
 {
     // Using << operator directly with std::any-returning function
-    obj1 << myFunc(); // Store an int in obj1
-    std::cout << obj1 << std::endl;  // Print the value (should be 42)
+    // obj1 << myFunc(); // Store an int in obj1
 
     // Using << operator with another std::any-returning function
-    obj1 << myStringFunc(); // Store a string in obj1
-    std::cout << obj1 << std::endl;  // Print the value (should be "Hello, World!")
+    // obj1 << myStringFunc(); // Store a string in obj1
+    // std::cout << obj1 << std::endl;  // Print the value (should be "Hello, World!")
+
+    go << myFunc();
+    std::cout << go << std::endl;  // Print the value (should be 42)
 
     return 0;
 }
