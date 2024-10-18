@@ -210,16 +210,27 @@ public:
         return *this;
     }
 
-    // استفاده از Future و Promise
+    // استفاده از Promise و Future
     template <typename Func>
     auto operator+(Func &&func)
     {
-        return std::async(std::launch::async, std::forward<Func>(func));
+        std::promise<void> promise;
+        auto future = promise.get_future();
+
+        std::jthread([func = std::forward<Func>(func), promise = std::move(promise)](std::stop_token st) mutable {
+            if (st.stop_requested()) {
+                return;
+            }
+            func();
+            promise.set_value(); // ارسال نتیجه
+        }).detach();
+
+        return future; // برگرداندن future
     }
 
     // استفاده از Thread Pool
     template <typename Func>
-    jthreadTaskClass &operator&(Func &&func)
+    jthreadTaskClass &operator=(Func &&func)
     {
         auto future = thread_pool_.enqueue(std::forward<Func>(func));
         future.get(); // Wait for the task to complete
@@ -257,15 +268,17 @@ int main()
         std::cout << "Function e is running\n";
     };
 
-    // استفاده از Future و Promise
-    go + []() {
-        // std::this_thread::sleep_for(std::chrono::seconds(1));
+    // استفاده از Promise و Future
+    auto future = go + []() {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
         std::cout << "Future task is running\n";
     };
 
+    future.get(); // Wait for the future task to complete
+
     // استفاده از Thread Pool
-    go & []() {
-        // std::this_thread::sleep_for(std::chrono::seconds(1));
+    go = []() {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
         std::cout << "Thread pool task is running\n";
     };
 
