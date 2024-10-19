@@ -359,9 +359,15 @@ int main()
         std::this_thread::sleep_for(std::chrono::seconds(3));
         std::cout << "Function c is running\n"; }, false) // اجرا به صورت deferred
         << std::make_pair([]()
-                          { std::cout << "Function d is running\n"; }, false); // اجرا به صورت deferred
+                          { std::cout << "Function d is running\n"; }, false) >>
+        []()
+    {
+        std::cout << "Function X is running\n";
+        // _Exit(0);
+    };
 
-    xgo >> []()
+    xgo  >>
+        []()
     {
         std::cout << "Function X is running\n";
         // _Exit(0);
