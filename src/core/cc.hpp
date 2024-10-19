@@ -26,6 +26,7 @@
 #include <type_traits>
 #include <functional>
 #include <chrono>
+#include <exception>
 
 using std::any;
 using std::any_cast;
@@ -48,6 +49,7 @@ using std::runtime_error;
 #include "../let/let.cpp"
 #include "../threads/async.cpp"
 #include "../threads/jthread.cpp"
+#include "../threads/fire.cc"
 #include "../var/var.cpp"
 
 

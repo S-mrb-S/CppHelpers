@@ -16,4 +16,5 @@
 # Don't ignore C files in all directories
 !**/*.hpp
 !**/*.cpp
+!**/*.cc
 !**/CMakeLists.*
