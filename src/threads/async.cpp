@@ -40,8 +40,7 @@ private:
     std::vector<std::future<void>> tasks_;
 };
 
-asyncTaskClass xgo; // xgo is simple for normal use thread.. (no safe at all, use fire or go for safe waiter)
-
+asyncTaskClass xgo;
 
 void async_test()
 {
