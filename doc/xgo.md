@@ -34,9 +34,9 @@ xgo << std::make_pair([]() {
 }, false);  // false means deferred execution
 ```
 
-## Immediate Execution with >>
+## Immediate Execution with (>>)
 
-To execute a task immediately and wait for its completion, use the >> operator.
+To execute a task immediately and wait for its completion, use the (>>) operator.
 ```
 xgo >> []() {
     std::cout << "Function X is running\n";
