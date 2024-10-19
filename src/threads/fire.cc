@@ -6,6 +6,10 @@
 class FireAndForget
 {
 public:
+
+    /**
+     * execute task on fire and push to waiter tasks (with waiter)
+     */
     template <typename Func>
     FireAndForget &operator>>(Func &&func)
     {
@@ -13,6 +17,9 @@ public:
         return *this;
     }
 
+    /**
+     * execute task on fire (no waiter tasks), fast and simple
+     */
     template <typename Func>
     FireAndForget &operator<<(Func &&func)
     {
@@ -57,13 +64,13 @@ public:
         return future;
     }
 
-    // صبر کردن برای اتمام یک تسک خاص
+    // wait for one task
     void waitForTask(std::future<void> &future)
     {
         future.wait();
     }
 
-    // صبر کردن برای اتمام تمامی تسک‌ها
+    // wait for all tasks
     void waitForAllTasks()
     {
         for (auto &future : futures_)
@@ -101,7 +108,6 @@ void fire_test()
         fire << lm
         {
             std::cout << "Immediate Task executed\n";
-            // fire fire;
             fire << lm
             {
                 std::cout << "Immediate Task executed\n";

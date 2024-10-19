@@ -6,6 +6,10 @@
 class asyncTaskClass
 {
 public:
+
+    /**
+     * Run tasks on async (no waiter task), execute and wait to end
+     */
     template <typename Func>
     asyncTaskClass &operator>>(Func &&func)
     {
@@ -13,6 +17,9 @@ public:
         return *this;
     }
 
+    /**
+     * Run task on async with waiter (wait)
+     */
     template <typename Func>
     asyncTaskClass &operator<<(Func &&func)
     {
@@ -20,6 +27,7 @@ public:
         return *this;
     }
 
+    // wait for all async tasks
     void wait()
     {
         for (auto &task : tasks_)
@@ -32,9 +40,10 @@ private:
     std::vector<std::future<void>> tasks_;
 };
 
-asyncTaskClass xgo;
+asyncTaskClass xgo; // xgo is simple for normal use thread.. (no safe at all, use fire or go for safe waiter)
 
-fn async_test()
+
+void async_test()
 {
 
     xgo << lm
@@ -63,7 +72,6 @@ fn async_test()
         std::cout << "Function a is running\n";
     };
 
-    // xgo.wait();
+    xgo.wait();
 
-    endf;
 }
