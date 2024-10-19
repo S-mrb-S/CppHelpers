@@ -8,7 +8,7 @@ class asyncTaskClass
 public:
 
     /**
-     * Run tasks on async (no waiter task), execute and wait to end
+     * Run tasks on async
      */
     template <typename Func>
     asyncTaskClass &operator>>(Func &&func)
