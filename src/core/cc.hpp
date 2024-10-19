@@ -35,6 +35,10 @@
 #include <mutex>
 #include <condition_variable>
 
+// omp
+#include <omp.h>
+
+
 using std::any;
 using std::any_cast;
 using std::string;

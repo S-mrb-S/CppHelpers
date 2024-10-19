@@ -3,6 +3,10 @@
 #include "../core/cc.hpp"
 // ===========================================================
 
+// op class
+#define safe >> // Go and wait (safe mod)
+#define qq >> // for classes: unsafe mod (شیفت راست)
+
 // function type
 #define fn inline std::any  // inline function for normal use
 #define endf return nullptr
