@@ -67,6 +67,7 @@ void fire_test() {
         std::cout << "Task 2 executed\n";
     };
 
+    // this is faster
     fire << [] {
         std::cout << "Immediate Task executed\n";
     };
@@ -76,3 +77,7 @@ void fire_test() {
     std::cout << "All tasks completed.\n";
 }
 ```
+
+# Conclusion
+
+The FireAndForget class offers a flexible approach to running tasks concurrently, providing a balance between fast execution and control over task completion.
