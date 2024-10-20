@@ -89,6 +89,7 @@ FireAndForget fire; // تسک ها را با قابلیت اتش و فراموش
 void fire_test()
 {
 
+    // safe is >>
     fire safe lm
     {
         std::this_thread::sleep_for(std::chrono::seconds(2));
@@ -101,6 +102,7 @@ void fire_test()
         std::cout << "Task 2 executed\n";
     };
 
+    // qq is <<
     // اجرای فوری یک تسک با استفاده از عملگر <<
     fire qq lm
     {
