@@ -97,16 +97,16 @@ void fire_test()
 {
 
     // safe is >>
-    fire >> []()
+    fire << []()
     {
         // std::this_thread::sleep_for(std::chrono::seconds(2));
-        std::cout << "Task 1 executed\n";
+        // std::cout << "Task 1 executed\n";
     };
 
-    fire >> []()
+    fire << []()
     {
         // std::this_thread::sleep_for(std::chrono::seconds(1));
-        std::cout << "Task 2 executed\n";
+        // std::cout << "Task 2 executed\n";
     };
 
     // qq is <<
@@ -116,37 +116,37 @@ void fire_test()
         // fire fire;
         fire << []()
         {
-            std::cout << "Immediate Task executed1\n";
+            // std::cout << "Immediate Task executed1\n";
             fire << []()
             {
-                std::cout << "Immediate Task executed2\n";
+                // std::cout << "Immediate Task executed2\n";
             };
         };
     };
 
     fire << []()
     {
-        std::cout << "Immediate Task executed3\n";
+        // std::cout << "Immediate Task executed3\n";
     };
 
-    fire >> []()
+    fire << []()
     {
         // std::this_thread::sleep_for(std::chrono::seconds(3));
-        std::cout << "Task 3 executed\n";
+        // std::cout << "Task 3 executed\n";
     };
 
     // صبر کردن برای اتمام تسک‌ها
-    std::cout << "Waiting for all tasks to complete...\n";
+    // std::cout << "Waiting for all tasks to complete...\n";
     // fire.waitForAllTasks();
 
-    std::cout << "All tasks completed.\n";
+    // std::cout << "All tasks completed.\n";
 
 }
 
 
 // Main function
 int main() {
-    for (size_t i = 0; i < 1000000; i++) // کاهش تعداد تسک‌ها
+    for (size_t i = 0; i < 10000; i++) // کاهش تعداد تسک‌ها
     {
         fire << []()
         {
@@ -154,7 +154,7 @@ int main() {
         };
     }
     
-    fire.waitForAllTasks(); // صبر کردن برای اتمام تسک‌ها
+    // fire.waitForAllTasks(); // صبر کردن برای اتمام تسک‌ها
 
     return 0;
 }

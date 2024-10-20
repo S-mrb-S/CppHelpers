@@ -267,7 +267,7 @@ public:
     template <typename Func>
     asyncTaskClass &operator<<(Func &&func)
     {
-        return *this << std::make_pair(std::forward<Func>(func), true); // پیش‌فرض async
+        return *this << std::make_pair(std::forward<Func>(func), false); // پیش‌فرض async
     }
 
     // توقف تمام تسک‌های در صف
@@ -345,35 +345,106 @@ private:
 
 asyncTaskClass xgo;
 
-int main()
+// int main()
+// {
+//     xgo << []()
+//     {
+//         std::this_thread::sleep_for(std::chrono::seconds(2));
+//         std::cout << "Function a is running\n";
+//     } // اجرا به صورت async به صورت پیش‌فرض
+//         << std::make_pair([]()
+//                           { std::cout << "Function b is running\n"; }, true) // اجرا به صورت async
+//         << std::make_pair([]()
+//                           {
+//         std::this_thread::sleep_for(std::chrono::seconds(3));
+//         std::cout << "Function c is running\n"; }, false) // اجرا به صورت deferred
+//         << std::make_pair([]()
+//                           { std::cout << "Function d is running\n"; }, false) >>
+//         []()
+//     {
+//         std::cout << "Function X is running\n";
+//         // _Exit(0);
+//     };
+
+//     xgo  >>
+//         []()
+//     {
+//         std::cout << "Function X is running\n";
+//         // _Exit(0);
+//     };
+
+//     xgo.get_all();
+
+//     return 0;
+// }
+
+void xgo_test()
 {
+
+    // safe is >>
     xgo << []()
     {
-        std::this_thread::sleep_for(std::chrono::seconds(2));
-        std::cout << "Function a is running\n";
-    } // اجرا به صورت async به صورت پیش‌فرض
-        << std::make_pair([]()
-                          { std::cout << "Function b is running\n"; }, true) // اجرا به صورت async
-        << std::make_pair([]()
-                          {
-        std::this_thread::sleep_for(std::chrono::seconds(3));
-        std::cout << "Function c is running\n"; }, false) // اجرا به صورت deferred
-        << std::make_pair([]()
-                          { std::cout << "Function d is running\n"; }, false) >>
-        []()
-    {
-        std::cout << "Function X is running\n";
-        // _Exit(0);
+        // std::this_thread::sleep_for(std::chrono::seconds(2));
+        std::cout << "Task 1 executed\n";
     };
 
-    xgo  >>
-        []()
+    xgo << []()
     {
-        std::cout << "Function X is running\n";
-        // _Exit(0);
+        // std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::cout << "Task 2 executed\n";
     };
 
+    // qq is <<
+    // اجرای فوری یک تسک با استفاده از عملگر <<
+    xgo << []()
+    {
+        // xgo xgo;
+        xgo << []()
+        {
+            std::cout << "Immediate Task executed1\n";
+            xgo << []()
+            {
+                std::cout << "Immediate Task executed2\n";
+            };
+        };
+    };
+
+    xgo << []()
+    {
+        std::cout << "Immediate Task executed3\n";
+    };
+
+    xgo << []()
+    {
+        // std::this_thread::sleep_for(std::chrono::seconds(3));
+        std::cout << "Task 3 executed\n";
+    };
+
+    // صبر کردن برای اتمام تسک‌ها
+    std::cout << "Waiting for all tasks to complete...\n";
+    // xgo.get_all();
+
+    // std::cout >> "All tasks completed.\n";
+
+}
+
+
+// Main function
+int main() {
+    for (size_t i = 0; i < 50000; i++) // کاهش تعداد تسک‌ها
+    {
+        // xgo << std::make_pair([]()
+        //                    { 
+        //                         xgo_test();
+        //                     }, true);
+        xgo >> []()
+        {
+            xgo_test();
+        };
+    }
+    
     xgo.get_all();
+    // fire.waitForAllTasks(); // صبر کردن برای اتمام تسک‌ها
 
     return 0;
 }
