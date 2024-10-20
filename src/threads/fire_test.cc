@@ -9,116 +9,152 @@
 #include <condition_variable>
 #include <atomic>
 
+
 class FireAndForget
 {
 public:
-    FireAndForget() : active_tasks_(0), stop_pool_(false)
-    {
-        // Start a pool of worker threads
-        for (size_t i = 0; i < std::thread::hardware_concurrency(); ++i) {
-            workers_.emplace_back([this]() {
-                while (true) {
-                    std::function<void()> task;
-                    {
-                        std::unique_lock<std::mutex> lock(queue_mutex_);
-                        cond_var_.wait(lock, [this] { return stop_pool_ || !tasks_.empty(); });
-                        if (stop_pool_ && tasks_.empty())
-                            return;
-                        task = std::move(tasks_.front());
-                        tasks_.pop();
-                    }
-                    task();  // Execute the task
-                }
-            });
-        }
-    }
 
-    ~FireAndForget()
-    {
-        {
-            std::unique_lock<std::mutex> lock(queue_mutex_);
-            stop_pool_ = true;
-        }
-        cond_var_.notify_all();
-        for (std::thread &worker : workers_)
-            worker.join();
-    }
-
+    /**
+     * execute task on fire and push to waiter tasks (with waiter)
+     */
     template <typename Func>
-    FireAndForget &operator<<(Func &&func)
+    FireAndForget &operator>>(Func &&func)
     {
-        {
-            std::unique_lock<std::mutex> lock(queue_mutex_);
-            tasks_.emplace([this, func = std::forward<Func>(func)]() {
-                execute(func);
-            });
-        }
-        cond_var_.notify_one();  // Notify one waiting worker thread
+        futures_.push_back(run(std::forward<Func>(func)));
         return *this;
     }
 
+    /**
+     * execute task on fire (no waiter tasks), fast and simple
+     */
+    template <typename Func>
+    FireAndForget &operator<<(Func &&func)
+    {
+        std::jthread([func = std::forward<Func>(func)]()
+                     {
+            try {
+                if (std::uncaught_exceptions() > 0) {
+                    throw std::runtime_error("Memory is being deallocated, stopping task.");
+                }
+                func();
+            } catch (const std::exception& e) {
+                std::cerr << "Exception in immediate task: " << e.what() << '\n';
+            } catch (...) {
+                std::cerr << "Unknown exception in immediate task.\n";
+            } })
+            .detach();
+
+        return *this;
+    }
+
+    // اجرا کردن یک تسک و بازگشت future برای صبر کردن
+    template <typename Func>
+    std::future<void> run(Func &&func)
+    {
+        std::promise<void> promise;
+        auto future = promise.get_future();
+
+        std::jthread([func = std::forward<Func>(func), promise = std::move(promise)]() mutable
+                     {
+            try {
+                func();
+                promise.set_value(); 
+            } catch (const std::exception& e) {
+                std::cerr << "Exception in thread: " << e.what() << '\n';
+                promise.set_exception(std::current_exception());
+            } catch (...) {
+                std::cerr << "Unknown exception in thread.\n";
+                promise.set_exception(std::current_exception());
+            } })
+            .detach();
+
+        return future;
+    }
+
+    // wait for one task
+    void waitForTask(std::future<void> &future)
+    {
+        future.wait();
+    }
+
+    // wait for all tasks
     void waitForAllTasks()
     {
-        std::unique_lock<std::mutex> lock(queue_mutex_);
-        cond_var_.wait(lock, [this] { return tasks_.empty(); });
+        for (auto &future : futures_)
+        {
+            future.wait();
+        }
     }
 
 private:
-    void execute(const std::function<void()> &func)
-    {
-        ++active_tasks_;  // Increment active task count
-        try {
-            func();  // Execute the function
-        } catch (const std::exception &e) {
-            std::cerr << "Exception in task: " << e.what() << '\n';
-        } catch (...) {
-            std::cerr << "Unknown exception in task.\n";
-        }
-        --active_tasks_;  // Decrement active task count
-    }
-
-    std::vector<std::thread> workers_;
-    std::queue<std::function<void()>> tasks_;
-    std::mutex queue_mutex_;
-    std::condition_variable cond_var_;
-    std::atomic<int> active_tasks_; // Keep track of active tasks
-    bool stop_pool_;
+    std::vector<std::future<void>> futures_;
 };
 
-FireAndForget fire;
+FireAndForget fire; // تسک ها را با قابلیت اتش و فراموش کن اجرا میکند.. و در عملگر شیفت راست قابلیت اضافه کردن تسک به لیست صف را دارد. در انتها این تسک ها را به صورت امن اجرا نمیکند.. اما سرعت و شتاب ان نسبت به بقیه بیشتر و سریع هست. اگر برنامه بسته شود تمام تسک ها ناتمام میماند و بسته میشوند.. باید برای شیفت راست در انتهای برنامه waiter رو صدا کنید.
+
 
 void fire_test()
 {
-    fire << [] {
-        std::this_thread::sleep_for(std::chrono::seconds(2));
+
+    // safe is >>
+    fire >> []()
+    {
+        // std::this_thread::sleep_for(std::chrono::seconds(2));
         std::cout << "Task 1 executed\n";
     };
 
-    fire << [] {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+    fire >> []()
+    {
+        // std::this_thread::sleep_for(std::chrono::seconds(1));
         std::cout << "Task 2 executed\n";
     };
 
-    fire << [] {
-        std::cout << "Immediate Task executed\n";
+    // qq is <<
+    // اجرای فوری یک تسک با استفاده از عملگر <<
+    fire << []()
+    {
+        // fire fire;
+        fire << []()
+        {
+            std::cout << "Immediate Task executed1\n";
+            fire << []()
+            {
+                std::cout << "Immediate Task executed2\n";
+            };
+        };
     };
 
-    fire << [] {
-        std::cout << "Immediate Task executed\n";
+    fire << []()
+    {
+        std::cout << "Immediate Task executed3\n";
     };
 
-    fire << [] {
-        std::this_thread::sleep_for(std::chrono::seconds(3));
+    fire >> []()
+    {
+        // std::this_thread::sleep_for(std::chrono::seconds(3));
         std::cout << "Task 3 executed\n";
     };
 
+    // صبر کردن برای اتمام تسک‌ها
     std::cout << "Waiting for all tasks to complete...\n";
     // fire.waitForAllTasks();
+
     std::cout << "All tasks completed.\n";
+
 }
+
 
 // Main function
 int main() {
-    fire_test();
+    for (size_t i = 0; i < 1000000; i++) // کاهش تعداد تسک‌ها
+    {
+        fire << []()
+        {
+            fire_test();
+        };
+    }
+    
+    fire.waitForAllTasks(); // صبر کردن برای اتمام تسک‌ها
+
     return 0;
 }
