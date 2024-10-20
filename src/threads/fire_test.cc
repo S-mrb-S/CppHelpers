@@ -4,63 +4,63 @@
 #include <thread>
 #include <chrono>
 #include <stdexcept>
+#include <queue>
+#include <mutex>
+#include <condition_variable>
 #include <atomic>
 
 class FireAndForget
 {
 public:
-    FireAndForget() : active_tasks_(0) {}
-
-    /**
-     * Execute task on fire and push to waiter tasks (with waiter)
-     */
-    template <typename Func>
-    FireAndForget &operator>>(Func &&func)
+    FireAndForget() : active_tasks_(0), stop_pool_(false)
     {
-        futures_.emplace_back(run(std::forward<Func>(func)));
-        return *this;
+        // Start a pool of worker threads
+        for (size_t i = 0; i < std::thread::hardware_concurrency(); ++i) {
+            workers_.emplace_back([this]() {
+                while (true) {
+                    std::function<void()> task;
+                    {
+                        std::unique_lock<std::mutex> lock(queue_mutex_);
+                        cond_var_.wait(lock, [this] { return stop_pool_ || !tasks_.empty(); });
+                        if (stop_pool_ && tasks_.empty())
+                            return;
+                        task = std::move(tasks_.front());
+                        tasks_.pop();
+                    }
+                    task();  // Execute the task
+                }
+            });
+        }
     }
 
-    /**
-     * Execute task on fire (no waiter tasks), fast and simple
-     */
+    ~FireAndForget()
+    {
+        {
+            std::unique_lock<std::mutex> lock(queue_mutex_);
+            stop_pool_ = true;
+        }
+        cond_var_.notify_all();
+        for (std::thread &worker : workers_)
+            worker.join();
+    }
+
     template <typename Func>
     FireAndForget &operator<<(Func &&func)
     {
-        std::jthread([this, func = std::forward<Func>(func)]() mutable {
-            execute(func);
-        }).detach();  // Detach since we don't wait for this task.
-
+        {
+            std::unique_lock<std::mutex> lock(queue_mutex_);
+            tasks_.emplace([this, func = std::forward<Func>(func)]() {
+                execute(func);
+            });
+        }
+        cond_var_.notify_one();  // Notify one waiting worker thread
         return *this;
     }
 
-    // Run a task and return a future for waiting
-    template <typename Func>
-    std::future<void> run(Func &&func)
-    {
-        std::promise<void> promise;
-        auto future = promise.get_future();
-        
-        std::jthread([this, func = std::forward<Func>(func), promise = std::move(promise)]() mutable {
-            execute([&] { func(); promise.set_value(); });
-        }).detach();
-
-        return future;
-    }
-
-    // Wait for one task
-    void waitForTask(std::future<void> &future)
-    {
-        future.wait();
-    }
-
-    // Wait for all tasks
     void waitForAllTasks()
     {
-        for (auto &future : futures_)
-        {
-            future.wait();
-        }
+        std::unique_lock<std::mutex> lock(queue_mutex_);
+        cond_var_.wait(lock, [this] { return tasks_.empty(); });
     }
 
 private:
@@ -77,40 +77,48 @@ private:
         --active_tasks_;  // Decrement active task count
     }
 
-    std::vector<std::future<void>> futures_;
+    std::vector<std::thread> workers_;
+    std::queue<std::function<void()>> tasks_;
+    std::mutex queue_mutex_;
+    std::condition_variable cond_var_;
     std::atomic<int> active_tasks_; // Keep track of active tasks
+    bool stop_pool_;
 };
 
 FireAndForget fire;
 
-int main()
+void fire_test()
 {
-    fire >> [] {
+    fire << [] {
         std::this_thread::sleep_for(std::chrono::seconds(2));
         std::cout << "Task 1 executed\n";
     };
 
-    fire >> [] {
+    fire << [] {
         std::this_thread::sleep_for(std::chrono::seconds(1));
         std::cout << "Task 2 executed\n";
-    };
-
-    fire << [] {
-        std::cout << "Immediate Task 1 executed\n";
     };
 
     fire << [] {
         std::cout << "Immediate Task executed\n";
     };
 
-    fire >> [] {
+    fire << [] {
+        std::cout << "Immediate Task executed\n";
+    };
+
+    fire << [] {
         std::this_thread::sleep_for(std::chrono::seconds(3));
         std::cout << "Task 3 executed\n";
     };
 
     std::cout << "Waiting for all tasks to complete...\n";
-    fire.waitForAllTasks();
+    // fire.waitForAllTasks();
     std::cout << "All tasks completed.\n";
+}
 
+// Main function
+int main() {
+    fire_test();
     return 0;
 }
