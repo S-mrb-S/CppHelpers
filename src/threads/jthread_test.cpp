@@ -268,6 +268,10 @@ int main()
         std::cout << "Function e is running\n";
     };
 
+    go = []() {
+        std::cout << "Function e is running\n";
+    };
+
     // استفاده از Promise و Future
     auto future = go + []() {
         std::this_thread::sleep_for(std::chrono::seconds(1));
